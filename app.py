@@ -52,7 +52,6 @@ def load_prediction_model():
         model_metadata["error"] = f"File {MODEL_PATH} not found in environment root."
         logger.warning(f"Target model payload '{MODEL_PATH}' could not be located.")
 
-# Initialize model load on startup
 load_prediction_model()
 
 # ==============================================================================
@@ -100,380 +99,388 @@ def require_api_session(f):
     return decorated_function
 
 # ==============================================================================
-# 5. CYBERPUNK UI GRAPHICS & STYLING TEMPLATE (HTML5/CSS3 Grid Architecture)
+# 5. CYBERPUNK UI GRAPHICS & MASTER LAYOUT TRUNK
 # ==============================================================================
-CYBERPUNK_BASE_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEURAL_CORE // INTERFACE_v2.0.76</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-deep: #030308;
-            --bg-surface: #0a0a16;
-            --bg-panel: #111126;
-            --neon-cyan: #00f3ff;
-            --neon-pink: #ff0055;
-            --neon-green: #39ff14;
-            --neon-yellow: #ffe600;
-            --text-primary: #ffffff;
-            --text-secondary: #7070a0;
-            --text-muted: #424267;
-            --border-glow: rgba(0, 243, 255, 0.25);
-            --grid-line: rgba(0, 243, 255, 0.02);
-        }
+def render_cyberpunk_page(content_html, active_page='login'):
+    """
+    Combines the master layout with page specific layout strings 
+    without relying on external template inheritance engines.
+    """
+    
+    # Generate navigation tabs dynamically based on identity states
+    nav_html = ""
+    if session.get('authenticated'):
+        dash_act = 'class="active"' if active_page == 'dash' else ''
+        anal_act = 'class="active"' if active_page == 'analytics' else ''
+        nav_html = f"""
+            <a href="{url_for('dashboard')}" {dash_act}>Matrix</a>
+            <a href="{url_for('analytics')}" {anal_act}>Telemetry</a>
+            <a href="{url_for('logout_action')}">Disconnect</a>
+        """
+    else:
+        nav_html = '<a href="#" class="active">Secure Portal</a>'
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    master_layout = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>NEURAL_CORE // INTERFACE_v2.0.76</title>
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+        <style>
+            :root {{
+                --bg-deep: #030308;
+                --bg-surface: #0a0a16;
+                --bg-panel: #111126;
+                --neon-cyan: #00f3ff;
+                --neon-pink: #ff0055;
+                --neon-green: #39ff14;
+                --neon-yellow: #ffe600;
+                --text-primary: #ffffff;
+                --text-secondary: #7070a0;
+                --text-muted: #424267;
+                --border-glow: rgba(0, 243, 255, 0.25);
+                --grid-line: rgba(0, 243, 255, 0.02);
+            }}
 
-        body {
-            background-color: var(--bg-deep);
-            background-image: 
-                linear-gradient(var(--grid-line) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-            background-size: 25px 25px;
-            color: var(--text-primary);
-            font-family: 'Share Tech Mono', monospace;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
+            * {{
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }}
 
-        /* Scanline Animation Effect */
-        body::before {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 99999;
-            background-size: 100% 4px, 6px 100%;
-            pointer-events: none;
-        }
+            body {{
+                background-color: var(--bg-deep);
+                background-image: 
+                    linear-gradient(var(--grid-line) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+                background-size: 25px 25px;
+                color: var(--text-primary);
+                font-family: 'Share Tech Mono', monospace;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                overflow-x: hidden;
+            }}
 
-        header {
-            background: var(--bg-surface);
-            border-bottom: 2px solid var(--neon-cyan);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 5px 20px rgba(0, 243, 255, 0.1);
-        }
+            body::before {{
+                content: " ";
+                display: block;
+                position: fixed;
+                top: 0; left: 0; bottom: 0; right: 0;
+                background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+                z-index: 99999;
+                background-size: 100% 4px, 6px 100%;
+                pointer-events: none;
+            }}
 
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+            header {{
+                background: var(--bg-surface);
+                border-bottom: 2px solid var(--neon-cyan);
+                padding: 15px 30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                box-shadow: 0 5px 20px rgba(0, 243, 255, 0.1);
+            }}
 
-        .glitch-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 900;
-            letter-spacing: 3px;
-            color: #fff;
-            text-shadow: 0 0 10px var(--neon-cyan);
-            text-transform: uppercase;
-        }
+            .logo-area {{
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }}
 
-        .system-badge {
-            background: rgba(0, 243, 255, 0.1);
-            border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            padding: 4px 10px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+            .glitch-title {{
+                font-family: 'Orbitron', sans-serif;
+                font-size: 1.5rem;
+                font-weight: 900;
+                letter-spacing: 3px;
+                color: #fff;
+                text-shadow: 0 0 10px var(--neon-cyan);
+                text-transform: uppercase;
+            }}
 
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            margin-left: 20px;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            border-bottom: 2px solid transparent;
-            padding-bottom: 5px;
-        }
+            .system-badge {{
+                background: rgba(0, 243, 255, 0.1);
+                border: 1px solid var(--neon-cyan);
+                color: var(--neon-cyan);
+                padding: 4px 10px;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }}
 
-        nav a:hover, nav a.active {
-            color: var(--neon-pink);
-            border-color: var(--neon-pink);
-            text-shadow: 0 0 8px var(--neon-pink);
-        }
+            nav a {{
+                color: var(--text-secondary);
+                text-decoration: none;
+                margin-left: 20px;
+                font-size: 1rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+                border-bottom: 2px solid transparent;
+                padding-bottom: 5px;
+            }}
 
-        .main-workspace {
-            flex: 1;
-            padding: 40px 20px;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-        }
+            nav a:hover, nav a.active {{
+                color: var(--neon-pink);
+                border-color: var(--neon-pink);
+                text-shadow: 0 0 8px var(--neon-pink);
+            }}
 
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
+            .main-workspace {{
+                flex: 1;
+                padding: 40px 20px;
+                max-width: 1400px;
+                width: 100%;
+                margin: 0 auto;
+            }}
 
-        @media (max-width: 900px) {
-            .grid-layout {
-                grid-template-columns: 1fr;
-            }
-        }
+            .grid-layout {{
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }}
 
-        .cyber-card {
-            background: var(--bg-panel);
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            position: relative;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+            @media (max-width: 900px) {{
+                .grid-layout {{
+                    grid-template-columns: 1fr;
+                }}
+            }}
 
-        .cyber-card::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0;
-            width: 10px; height: 10px;
-            border-top: 2px solid var(--neon-cyan);
-            border-left: 2px solid var(--neon-cyan);
-        }
+            .cyber-card {{
+                background: var(--bg-panel);
+                border: 1px solid rgba(0, 243, 255, 0.2);
+                position: relative;
+                padding: 30px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            }}
 
-        .cyber-card::after {
-            content: "";
-            position: absolute;
-            bottom: 0; right: 0;
-            width: 10px; height: 10px;
-            border-bottom: 2px solid var(--neon-pink);
-            border-right: 2px solid var(--neon-pink);
-        }
+            .cyber-card::before {{
+                content: "";
+                position: absolute;
+                top: 0; left: 0;
+                width: 10px; height: 10px;
+                border-top: 2px solid var(--neon-cyan);
+                border-left: 2px solid var(--neon-cyan);
+            }}
 
-        .card-header {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 25px;
-            color: var(--neon-cyan);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(74, 74, 117, 0.3);
-            padding-bottom: 10px;
-        }
+            .cyber-card::after {{
+                content: "";
+                position: absolute;
+                bottom: 0; right: 0;
+                width: 10px; height: 10px;
+                border-bottom: 2px solid var(--neon-pink);
+                border-right: 2px solid var(--neon-pink);
+            }}
 
-        .form-row {
-            margin-bottom: 25px;
-        }
+            .card-header {{
+                font-family: 'Orbitron', sans-serif;
+                font-size: 1.1rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-bottom: 25px;
+                color: var(--neon-cyan);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid rgba(74, 74, 117, 0.3);
+                padding-bottom: 10px;
+            }}
 
-        label {
-            display: block;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-        }
+            .form-row {{
+                margin-bottom: 25px;
+            }}
 
-        .input-wrapper {
-            position: relative;
-        }
+            label {{
+                display: block;
+                text-transform: uppercase;
+                font-size: 0.85rem;
+                letter-spacing: 2px;
+                margin-bottom: 8px;
+                color: var(--text-secondary);
+            }}
 
-        input, select {
-            width: 100%;
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(70, 70, 120, 0.5);
-            color: #fff;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-        }
+            input, select {{
+                width: 100%;
+                padding: 14px;
+                background: rgba(0, 0, 0, 0.6);
+                border: 1px solid rgba(70, 70, 120, 0.5);
+                color: #fff;
+                font-family: 'Share Tech Mono', monospace;
+                font-size: 1.1rem;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+            }}
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
-            background: rgba(0, 0, 0, 0.8);
-        }
+            input:focus, select:focus {{
+                outline: none;
+                border-color: var(--neon-cyan);
+                box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+                background: rgba(0, 0, 0, 0.8);
+            }}
 
-        .btn-cyber {
-            width: 100%;
-            padding: 16px;
-            background: transparent;
-            border: 1px solid var(--neon-pink);
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            font-weight: bold;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
+            .btn-cyber {{
+                width: 100%;
+                padding: 16px;
+                background: transparent;
+                border: 1px solid var(--neon-pink);
+                color: #fff;
+                font-family: 'Orbitron', sans-serif;
+                font-size: 1.1rem;
+                font-weight: bold;
+                letter-spacing: 3px;
+                text-transform: uppercase;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }}
 
-        .btn-cyber:hover {
-            background: var(--neon-pink);
-            box-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
-            text-shadow: 0 0 5px #fff;
-        }
+            .btn-cyber:hover {{
+                background: var(--neon-pink);
+                box-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
+                text-shadow: 0 0 5px #fff;
+            }}
 
-        /* Metric Dashboard Visuals */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
+            .metrics-grid {{
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-bottom: 25px;
+            }}
 
-        .metric-tile {
-            background: rgba(0, 0, 0, 0.4);
-            border-left: 3px solid var(--text-muted);
-            padding: 15px;
-        }
+            .metric-tile {{
+                background: rgba(0, 0, 0, 0.4);
+                border-left: 3px solid var(--text-muted);
+                padding: 15px;
+            }}
 
-        .metric-tile.active-cyan { border-left-color: var(--neon-cyan); }
-        .metric-tile.active-pink { border-left-color: var(--neon-pink); }
+            .metric-tile.active-cyan {{ border-left-color: var(--neon-cyan); }}
+            .metric-tile.active-pink {{ border-left-color: var(--neon-pink); }}
 
-        .metric-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
+            .metric-label {{
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                margin-bottom: 5px;
+            }}
 
-        .metric-value {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.6rem;
-            color: #fff;
-        }
+            .metric-value {{
+                font-family: 'Orbitron', sans-serif;
+                font-size: 1.6rem;
+                color: #fff;
+            }}
 
-        .terminal-block {
-            background: #020205;
-            border: 1px solid rgba(70, 70, 110, 0.3);
-            font-size: 0.9rem;
-            padding: 15px;
-            height: 180px;
-            overflow-y: auto;
-            color: var(--neon-green);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-        }
+            .terminal-block {{
+                background: #020205;
+                border: 1px solid rgba(70, 70, 110, 0.3);
+                font-size: 0.9rem;
+                padding: 15px;
+                height: 180px;
+                overflow-y: auto;
+                color: var(--neon-green);
+            }}
 
-        .terminal-line {
-            margin-bottom: 6px;
-            line-height: 1.4;
-        }
+            .terminal-line {{
+                margin-bottom: 6px;
+                line-height: 1.4;
+            }}
 
-        .output-display {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-            border: 1px dashed rgba(0, 243, 255, 0.2);
-            background: rgba(0,0,0,0.2);
-            text-align: center;
-            padding: 20px;
-        }
+            .output-display {{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                min-height: 200px;
+                border: 1px dashed rgba(0, 243, 255, 0.2);
+                background: rgba(0,0,0,0.2);
+                text-align: center;
+                padding: 20px;
+            }}
 
-        .output-placeholder {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+            .output-placeholder {{
+                color: var(--text-muted);
+                font-size: 1.1rem;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+            }}
 
-        .prediction-result {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            font-weight: 900;
-            margin-top: 10px;
-            display: none;
-        }
+            .prediction-result {{
+                font-family: 'Orbitron', sans-serif;
+                font-size: 3rem;
+                font-weight: 900;
+                margin-top: 10px;
+                display: none;
+            }}
 
-        .class-positive {
-            color: var(--neon-cyan);
-            text-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
-        }
-        
-        .class-negative {
-            color: var(--neon-yellow);
-            text-shadow: 0 0 20px rgba(255, 230, 0, 0.6);
-        }
+            .class-positive {{
+                color: var(--neon-cyan);
+                text-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+            }}
+            
+            .class-negative {{
+                color: var(--neon-yellow);
+                text-shadow: 0 0 20px rgba(255, 230, 0, 0.6);
+            }}
 
-        footer {
-            background: var(--bg-surface);
-            padding: 15px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(70, 70, 120, 0.2);
-            letter-spacing: 1px;
-            margin-top: auto;
-        }
-        
-        /* Auth Screen Specific styles */
-        .auth-container {
-            max-width: 400px;
-            width: 100%;
-            margin: 100px auto;
-        }
-    </style>
-</head>
-<body>
+            footer {{
+                background: var(--bg-surface);
+                padding: 15px;
+                text-align: center;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                border-top: 1px solid rgba(70, 70, 120, 0.2);
+                letter-spacing: 1px;
+                margin-top: auto;
+            }}
+            
+            .auth-container {{
+                max-width: 400px;
+                width: 100%;
+                margin: 100px auto;
+            }}
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="logo-area">
+                <div class="glitch-title">NEURAL_CORE //</div>
+                <div class="system-badge">SYS_V_{model_metadata['version']}</div>
+            </div>
+            <nav>
+                {nav_html}
+            </nav>
+        </header>
 
-    <header>
-        <div class="logo-area">
-            <div class="glitch-title">NEURAL_CORE //</div>
-            <div class="system-badge">SYS_V_{{ meta.version }}</div>
+        <div class="main-workspace">
+            {content_html}
         </div>
-        <nav>
-            {% if session.get('authenticated') %}
-                <a href="{{ url_for('dashboard') }}" class="{{ 'active' if page == 'dash' }}">Matrix</a>
-                <a href="{{ url_for('analytics') }}" class="{{ 'active' if page == 'analytics' }}">Telemetry</a>
-                <a href="{{ url_for('logout_action') }}">Disconnect</a>
-            {% else %}
-                <a href="#" class="active">Secure Portal</a>
-            {% endif %}
-        </nav>
-    </header>
 
-    <div class="main-workspace">
-        {% block content %}{% endblock %}
-    </div>
-
-    <footer>
-        // QUANTUM HARDWARE SYNC ACTIVE // CORE METRICS RUNNING UNDER PYTHON FLASK INTEGRATION
-    </footer>
-
-</body>
-</html>
-"""
+        <footer>
+            // QUANTUM HARDWARE SYNC ACTIVE // CORE METRICS RUNNING UNDER PYTHON FLASK INTEGRATION
+        </footer>
+    </body>
+    </html>
+    """
+    return render_template_string(master_layout)
 
 # ==============================================================================
 # 6. ROUTE HANDLERS & FLASK CONTROLLERS
 # ==============================================================================
+
+@app.route('/')
+def root_redirect():
+    if session.get("authenticated", False):
+        return redirect(url_for("dashboard"))
+    return redirect(url_for("login_page"))
 
 @app.route('/portal/login', methods=['GET', 'POST'])
 def login_page():
     if session.get("authenticated", False):
         return redirect(url_for("dashboard"))
         
-    error = None
+    error_msg = ""
     if request.method == 'POST':
-        # Simple deployment credential access (Defaulting to cyber/matrix)
         username = request.form.get("username")
         password = request.form.get("password")
         
@@ -482,20 +489,16 @@ def login_page():
             logger.info("Session authentication successfully established for core user context.")
             return redirect(url_for("dashboard"))
         else:
-            error = "ACCESS DENIED: INVALID DECRYPTION KEYS"
+            error_msg = '<div style="color: var(--neon-pink); margin-bottom: 20px; font-size: 0.9rem;">// ACCESS DENIED: INVALID DECRYPTION KEYS</div>'
             logger.warning("Unauthorized access attempt flagged on terminal login interface.")
 
-    auth_html = """
-    {% extends "base" %}
-    {% block content %}
+    auth_body = f"""
     <div class="cyber-card auth-container">
         <div class="card-header">
             <span>TERMINAL ACCESS REQUEST</span>
         </div>
-        {% if error %}
-            <div style="color: var(--neon-pink); margin-bottom: 20px; font-size: 0.9rem;">// {{ error }}</div>
-        {% endif %}
-        <form method="POST" action="{{ url_for('login_page') }}">
+        {error_msg}
+        <form method="POST" action="{url_for('login_page')}">
             <div class="form-row">
                 <label>User Identifier</label>
                 <input type="text" name="username" placeholder="e.g., cyber" required autocomplete="off">
@@ -507,29 +510,27 @@ def login_page():
             <button type="submit" class="btn-cyber">Authenticate Grid</button>
         </form>
     </div>
-    {% endblock %}
     """
-    return render_template_string(auth_html, meta=model_metadata, error=error, page='login')
+    return render_cyberpunk_page(auth_body, active_page='login')
 
 @app.route('/portal/logout')
 def logout_action():
     session.clear()
     return redirect(url_for("login_page"))
 
-@app.route('/')
 @app.route('/dashboard')
 @require_api_session
 def dashboard():
-    dash_html = """
-    {% extends "base" %}
-    {% block content %}
+    status_color = 'var(--neon-green)' if model_metadata['status'] == 'OPERATIONAL' else 'var(--neon-pink)'
+    disable_attr = 'disabled' if model_metadata['status'] != 'OPERATIONAL' else ''
+
+    dash_body = f"""
     <div class="grid-layout">
-        <!-- Input Processing Vector -->
         <div class="cyber-card">
             <div class="card-header">
                 <span>INPUT PROCESSING VECTOR</span>
-                <span style="color: {{ 'var(--neon-green)' if meta.status == 'OPERATIONAL' else 'var(--neon-pink)' }}">
-                    ● {{ meta.status }}
+                <span style="color: {status_color}">
+                    ● {model_metadata['status']}
                 </span>
             </div>
             
@@ -552,13 +553,12 @@ def dashboard():
                     <input type="number" id="salary" name="salary" min="0" value="50000" step="500" required>
                 </div>
                 
-                <button type="submit" class="btn-cyber" {% if meta.status != 'OPERATIONAL' %}disabled{% endif %}>
+                <button type="submit" class="btn-cyber" {disable_attr}>
                     Execute Engine Target Run
                 </button>
             </form>
         </div>
 
-        <!-- Realtime Engine Output Visualizer -->
         <div class="cyber-card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
                 <div class="card-header">
@@ -576,14 +576,14 @@ def dashboard():
                 <label>Operational Response Matrix Logs</label>
                 <div class="terminal-block" id="terminal-screen">
                     <div class="terminal-line" style="color: var(--text-secondary)">// Initializing core operational terminal streams...</div>
-                    <div class="terminal-line" style="color: var(--text-secondary)">// System validation check status: {{ meta.status }}</div>
+                    <div class="terminal-line" style="color: var(--text-secondary)">// System validation check status: {model_metadata['status']}</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('matrix-prediction-form').addEventListener('submit', async function(event) {
+        document.getElementById('matrix-prediction-form').addEventListener('submit', async function(event) {{
             event.preventDefault();
             
             const genderVal = parseFloat(document.getElementById('gender').value);
@@ -599,62 +599,63 @@ def dashboard():
             resVal.style.display = "none";
             latencyBox.style.display = "none";
             
-            try {
+            try {{
                 const startTime = performance.now();
-                const response = await fetch('/api/predict', {
+                const response = await fetch('/api/predict', {{
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ features: [genderVal, ageVal, salaryVal] })
-                });
+                    headers: {{'Content-Type': 'application/json'}},
+                    body: JSON.stringify({{ features: [genderVal, ageVal, salaryVal] }})
+                }});
                 const duration = (performance.now() - startTime).toFixed(2);
-                
                 const data = await response.json();
                 
-                // Add terminal line log
                 const timeStr = new Date().toLocaleTimeString();
                 const logLine = document.createElement('div');
                 logLine.className = 'terminal-line';
                 
-                if (response.ok && data.success) {
+                if (response.ok && data.success) {{
                     placeholder.innerText = "VECTOR OUTPUT DETECTED:";
                     resVal.className = "prediction-result " + (data.prediction === 1 ? "class-positive" : "class-negative");
                     resVal.innerText = "CLASS_" + data.prediction;
                     resVal.style.display = "block";
                     
-                    latencyBox.innerText = `[Execution Latency: ${duration}ms | Engine Latency: ${data.metrics.execution_ms.toFixed(2)}ms]`;
+                    latencyBox.innerText = `[Execution Latency: ${{duration}}ms | Engine Latency: ${{data.metrics.execution_ms.toFixed(2)}}ms]`;
                     latencyBox.style.display = "block";
                     
-                    logLine.innerText = `[${timeStr}] SYNAPSE OK: Out=${data.prediction} in ${duration}ms`;
-                } else {
+                    logLine.innerText = `[${{timeStr}}] SYNAPSE OK: Out=${{data.prediction}} in ${{duration}}ms`;
+                }} else {{
                     placeholder.innerText = "TRANSLATION EXCEPTION RECORDED";
                     resVal.className = "prediction-result class-negative";
                     resVal.innerText = "FAIL";
                     resVal.style.display = "block";
                     
-                    logLine.className = 'terminal-line';
                     logLine.style.color = 'var(--neon-pink)';
-                    logLine.innerText = `[${timeStr}] CRITICAL_ERR: ${data.error || 'Unknown Exception'}`;
-                }
+                    logLine.innerText = `[${{timeStr}}] CRITICAL_ERR: ${{data.error || 'Unknown Exception'}`;
+                }}
                 terminal.insertBefore(logLine, terminal.firstChild);
                 
-            } catch (err) {
+            }} catch (err) {{
                 placeholder.innerText = "NETWORK PIPELINE DISRUPTED";
                 resVal.className = "prediction-result class-negative";
                 resVal.innerText = "OFFLINE";
                 resVal.style.display = "block";
-            }
-        });
+            }}
+        }});
     </script>
-    {% endblock %}
     """
-    return render_template_string(dash_html, meta=model_metadata, page='dash')
+    return render_cyberpunk_page(dash_body, active_page='dash')
 
 @app.route('/analytics')
 @require_api_session
 def analytics():
-    analytics_html = """
-    {% extends "base" %}
-    {% block content %}
+    log_lines = ""
+    if not METRICS_STORE["recent_logs"]:
+        log_lines = '<div class="terminal-line" style="color: var(--text-muted)">// Stream cache empty. Awaiting operational analytics data targets...</div>'
+    else:
+        for log in METRICS_STORE["recent_logs"]:
+            log_lines += f'<div class="terminal-line">{log}</div>'
+
+    analytics_body = f"""
     <div class="cyber-card">
         <div class="card-header">
             <span>CORE SYSTEM METRICS & DATA STREAMS</span>
@@ -663,35 +664,29 @@ def analytics():
         <div class="metrics-grid">
             <div class="metric-tile active-cyan">
                 <div class="metric-label">Total Execution Requests</div>
-                <div class="metric-value">{{ metrics.total_requests }}</div>
+                <div class="metric-value">{METRICS_STORE['total_requests']}</div>
             </div>
             <div class="metric-tile active-pink">
                 <div class="metric-label">Processing Integrity Failures</div>
-                <div class="metric-value">{{ metrics.failed_predictions }}</div>
+                <div class="metric-value">{METRICS_STORE['failed_predictions']}</div>
             </div>
             <div class="metric-tile">
                 <div class="metric-label">Class Alpha Resolves (0)</div>
-                <div class="metric-value">{{ metrics.class_0_count }}</div>
+                <div class="metric-value">{METRICS_STORE['class_0_count']}</div>
             </div>
             <div class="metric-tile">
                 <div class="metric-label">Class Beta Resolves (1)</div>
-                <div class="metric-value">{{ metrics.class_1_count }}</div>
+                <div class="metric-value">{METRICS_STORE['class_1_count']}</div>
             </div>
         </div>
 
         <label style="margin-top: 30px;">Historical Pipeline Streams (Last 20 Runs)</label>
         <div class="terminal-block" style="height: 300px;">
-            {% if not metrics.recent_logs %}
-                <div class="terminal-line" style="color: var(--text-muted)">// Stream cache empty. Awaiting operational analytics data targets...</div>
-            {% endif %}
-            {% for log in metrics.recent_logs %}
-                <div class="terminal-line">{{ log }}</div>
-            {% endfor %}
+            {log_lines}
         </div>
     </div>
-    {% endblock %}
     """
-    return render_template_string(analytics_html, meta=model_metadata, metrics=METRICS_STORE, page='analytics')
+    return render_cyberpunk_page(analytics_body, active_page='analytics')
 
 # ==============================================================================
 # 7. HIGH PERF PIPELINE API ENDPOINT FOR CORRELATION EXECUTIONS
@@ -700,7 +695,6 @@ def analytics():
 def execute_prediction_api():
     start_time = time.perf_counter()
     
-    # 1. Structural Availability Validation
     if model is None:
         log_prediction_event(None, None, 0, success=False, error_msg="Model matrix structural binary is unassigned/missing.")
         return jsonify({
@@ -715,28 +709,23 @@ def execute_prediction_api():
         log_prediction_event(None, None, 0, success=False, error_msg="Failed decoding JSON transmission payload block.")
         return jsonify({"success": False, "error": "Invalid request architecture type. JSON required."}), 400
 
-    # 2. Key Presence Verification
     if not payload or 'features' not in payload:
         log_prediction_event(None, None, 0, success=False, error_msg="Data vector missing required 'features' dynamic structure key.")
         return jsonify({"success": False, "error": "Data object signature mismatch. 'features' element expected."}), 422
         
     features_input = payload['features']
     
-    # 3. Dynamic Matrix Shape Validation
     if not isinstance(features_input, list) or len(features_input) != 3:
         log_prediction_event(features_input, None, 0, success=False, error_msg="Feature set dimensions out of bounds.")
         return jsonify({"success": False, "error": "Feature array dimensionality error. Matrix must span exactly [Gender, Age, Salary]."}), 422
 
     try:
-        # Cast inputs to native float mappings safely
         parsed_vector = [float(x) for x in features_input]
         input_matrix = np.array([parsed_vector])
         
-        # 4. Neural Network Core Invocation Run
         prediction_result = model.predict(input_matrix)
         resolved_class = int(prediction_result[0])
         
-        # Performance Evaluation Matrix Check
         end_time = time.perf_counter()
         execution_latency_ms = (end_time - start_time) * 1000.0
         
@@ -764,36 +753,9 @@ def execute_prediction_api():
         return jsonify({"success": False, "error": f"Critical execution engine system crash: {str(general_sys_err)}"}), 500
 
 # ==============================================================================
-# 8. JINJA2 LAYOUT INJECTION LINKING
-# ==============================================================================
-@app.before_request
-def setup_template_injection_layer():
-    # Inject our cyberpunk template directly into Flask's string template cache
-    # to avoid needing a separate templates/ folder during Render deployments
-    app.jinja_env.globals.update(base_template=CYBERPUNK_BASE_TEMPLATE)
-
-# Directly overwrite internal engine lookup behavior for extreme layout customization portability
-@app.context_processor
-def inject_custom_base():
-    # Makes base layout structural component discoverable on startup
-    return dict(base_layout_raw=CYBERPUNK_BASE_TEMPLATE)
-
-# Overriding template finder mechanism for zero-configuration deployments
-def custom_template_rendering_override():
-    # Dynamically inject base structurally to context environment dictionary cache
-    # ensuring fluid execution framework mapping compatibility across Render virtual distributions
-    pass
-
-# Initialize manual structural lookup binding hooks
-with app.app_context():
-    # Registers template components dynamically into memory
-    app.jinja_env.from_string(CYBERPUNK_BASE_TEMPLATE)
-
-# ==============================================================================
-# 9. RUNTIME PROCESS BINDING CONTROL
+# 8. RUNTIME PROCESS BINDING CONTROL
 # ==============================================================================
 if __name__ == '__main__':
-    # Render binds automatically to specified dynamic ENV port configurations 
     target_port = int(os.environ.get("PORT", 5000))
     logger.info(f"Booting system engine sequence inside matrix network on port: {target_port}")
     app.run(host='0.0.0.0', port=target_port, debug=False)
