@@ -102,12 +102,6 @@ def require_api_session(f):
 # 5. CYBERPUNK UI GRAPHICS & MASTER LAYOUT TRUNK
 # ==============================================================================
 def render_cyberpunk_page(content_html, active_page='login'):
-    """
-    Combines the master layout with page specific layout strings 
-    without relying on external template inheritance engines.
-    """
-    
-    # Generate navigation tabs dynamically based on identity states
     nav_html = ""
     if session.get('authenticated'):
         dash_act = 'class="active"' if active_page == 'dash' else ''
@@ -630,7 +624,7 @@ def dashboard():
                     resVal.style.display = "block";
                     
                     logLine.style.color = 'var(--neon-pink)';
-                    logLine.innerText = `[${{timeStr}}] CRITICAL_ERR: ${{data.error || 'Unknown Exception'}`;
+                    logLine.innerText = `[${{timeStr}}] CRITICAL_ERR: ${{data.error || 'Unknown Exception'}}`;
                 }}
                 terminal.insertBefore(logLine, terminal.firstChild);
                 
