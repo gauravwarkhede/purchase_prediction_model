@@ -23,7 +23,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "cyberpunk_secret_matrix_999
 # ==============================================================================
 # 2. MODEL STORAGE & METADATA LOADER
 # ==============================================================================
-MODEL_PATH = "naive_mode.pkl"
+MODEL_PATH = "naive_model.pkl"
 model = None
 model_metadata = {
     "status": "OFFLINE",
